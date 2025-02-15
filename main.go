@@ -14,6 +14,11 @@ func main() {
 		io.WriteString(w, "Hello world")
 	})
 
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("Health check")
+		io.WriteString(w, "200 - OK")
+	})
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 }
