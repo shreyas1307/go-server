@@ -15,21 +15,18 @@ type Server struct {
 }
 
 func main() {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/hello-world", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("Hello world")
-		io.WriteString(w, "Hello world")
-	})
+	srv := Server{
+		mux: chi.NewRouter(),
+	}
+	srv.mux.Use(middleware.Logger)
+	srv.mux.Use(middleware.Recoverer)
+	srv.mux.Get("/hello-world", HelloWorldHandler)
 
-	r.Post("/todo", TodoHandler)
+	srv.mux.Post("/todo", TodoHandler)
 
-	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("Health check")
-		io.WriteString(w, "200 - OK")
-	})
+	srv.mux.Get("/healthz", HealthzHandler)
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080", srv.mux))
 }
 
 func TodoHandler(w http.ResponseWriter, r *http.Request) {
@@ -40,4 +37,14 @@ func TodoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Printf("Received todo: %s\n", b)
 	io.WriteString(w, "Received todo")
+}
+
+func HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("Hello world")
+	io.WriteString(w, "Hello world")
+}
+
+func HealthzHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("Health check")
+	io.WriteString(w, "200 - OK")
 }
