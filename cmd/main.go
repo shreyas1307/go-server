@@ -8,10 +8,13 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/shreyas1307/go-server/internal/handlers"
+	"github.com/shreyas1307/go-server/internal/store"
 )
 
 type Server struct {
 	mux *chi.Mux
+	db  store.ServerStore
 }
 
 func main() {
@@ -22,29 +25,21 @@ func main() {
 	srv.mux.Use(middleware.Recoverer)
 	srv.mux.Get("/hello-world", HelloWorldHandler)
 
-	srv.mux.Post("/todo", TodoHandler)
+	srv.mux.Mount("/todo", (&handlers.TodoHandler{
+		Store: srv.db,
+	}).Router())
 
 	srv.mux.Get("/healthz", HealthzHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", srv.mux))
 }
 
-func TodoHandler(w http.ResponseWriter, r *http.Request) {
-	b, err := io.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, "Error reading request body")
-	}
-	fmt.Printf("Received todo: %s\n", b)
-	io.WriteString(w, "Received todo")
-}
-
 func HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("Hello world")
-	io.WriteString(w, "Hello world")
+	fmt.Printf("Hello world \n")
+	io.WriteString(w, "Hello world \n")
 }
 
 func HealthzHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("Health check")
-	io.WriteString(w, "200 - OK")
+	fmt.Printf("Health check \n")
+	io.WriteString(w, "200 - OK \n")
 }
