@@ -38,27 +38,27 @@ func TestAddTodoSuccessful(t *testing.T) {
 	todoMarshal, err := json.Marshal(todo)
 	assert.NoError(t, err)
 
-	reader := bytes.NewReader(todoMarshal)
-	request := httptest.NewRequest(http.MethodPost, "/todo/add", reader)
-	recorder := httptest.NewRecorder()
+	r := bytes.NewReader(todoMarshal)
+	rq := httptest.NewRequest(http.MethodPost, "/todo/add", r)
+	rr := httptest.NewRecorder()
 
-	th.AddTodo(recorder, request)
+	th.AddTodo(rr, rq)
 
-	res := recorder.Result()
+	res := rr.Result()
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
 	b, err := io.ReadAll(res.Body)
 	assert.NoError(t, err)
 	defer res.Body.Close()
 
-	expextedResponse := map[string]interface{}{
+	response := map[string]interface{}{
 		"successful": true,
 		"message":    "new todo added",
 	}
-	expectedResponseMarshall, err := json.Marshal(expextedResponse)
+	responseMarshal, err := json.Marshal(response)
 	assert.NoError(t, err)
 
-	assert.Equal(t, expectedResponseMarshall, b)
+	assert.Equal(t, responseMarshal, b)
 }
 
 func TestAddTodoFailure(t *testing.T) {
@@ -74,13 +74,13 @@ func TestAddTodoFailure(t *testing.T) {
 	badTodoMarshal, err := json.Marshal(badTodo)
 	assert.NoError(t, err)
 
-	reader := bytes.NewReader(badTodoMarshal)
-	request := httptest.NewRequest(http.MethodPost, "/todo/add", reader)
-	recorder := httptest.NewRecorder()
+	r := bytes.NewReader(badTodoMarshal)
+	rq := httptest.NewRequest(http.MethodPost, "/todo/add", r)
+	rr := httptest.NewRecorder()
 
-	th.AddTodo(recorder, request)
+	th.AddTodo(rr, rq)
 
-	res := recorder.Result()
+	res := rr.Result()
 	// below test fails... may have to edit handler code to
 	// check if I'm getting the corect request body
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
