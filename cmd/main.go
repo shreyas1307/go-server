@@ -17,7 +17,7 @@ import (
 
 type Server struct {
 	mux *chi.Mux
-	db  store.ServerStore
+	db  store.Store
 }
 
 func main() {
