@@ -11,7 +11,7 @@ import (
 )
 
 type TodoHandler struct {
-	Store store.ServerStore
+	Store store.Store
 }
 
 func (th *TodoHandler) Router() chi.Router {
@@ -34,16 +34,13 @@ func (th *TodoHandler) GetTodos(w http.ResponseWriter, r *http.Request) {
 }
 
 func (th *TodoHandler) AddTodo(w http.ResponseWriter, r *http.Request) {
-	b, err := io.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, "Error reading request body \n")
-		return
-	}
+
 	var todo models.Todo
-	if err := json.Unmarshal(b, &todo); err != nil {
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&todo); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, "Error unmarshalling todo")
+		io.WriteString(w, "Error decoding todo \n")
 		return
 	}
 
