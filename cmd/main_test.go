@@ -1,7 +1,7 @@
 package main_test
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -25,7 +25,7 @@ func TestHelloWorld(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 200, res.StatusCode)
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	assert.NoError(t, err)
 	assert.Equal(t, "Hello world", string(body))
 }
@@ -44,7 +44,7 @@ func TestHealthz(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 200, res.StatusCode)
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	assert.NoError(t, err)
 	assert.Equal(t, "200 - OK", string(body))
 }
