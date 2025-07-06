@@ -8,9 +8,5 @@ import (
 
 type Store interface {
 	AddTodo(ctx context.Context, todos models.Todo) error
-	GetTodos(ctx context.Context) (models.TodoList, error)
-}
-
-type Server struct {
-	store Store
+	GetTodos(ctx context.Context) ([]models.Todo, error)
 }
