@@ -47,7 +47,6 @@ func NewTodoHandler(store store.Store) (*TodoHandler, error) {
 func (th *TodoHandler) GetTodos(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	todoItems, err := th.Store.GetTodos(ctx)
-	println(todoItems) // Debugging, I'm unable to print the todo items for the response
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		res, _ := json.Marshal(&todoResponse{
@@ -74,6 +73,7 @@ func (th *TodoHandler) GetTodos(w http.ResponseWriter, r *http.Request) {
 
 // AddTodo handles the request to add a new todo item.
 func (th *TodoHandler) AddTodo(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 
 	var todo models.Todo
 	decoder := json.NewDecoder(r.Body)
@@ -83,6 +83,18 @@ func (th *TodoHandler) AddTodo(w http.ResponseWriter, r *http.Request) {
 		res, _ := json.Marshal(&todoResponse{
 			Successful: false,
 			Message:    "Invalid request body",
+			Error:      err,
+		})
+		w.Write(res)
+		return
+	}
+
+	err := th.Store.AddTodo(ctx, todo)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		res, _ := json.Marshal(&todoResponse{
+			Successful: false,
+			Message:    "Error adding todo",
 			Error:      err,
 		})
 		w.Write(res)
