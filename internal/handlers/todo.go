@@ -19,7 +19,7 @@ type TodoHandler struct {
 type todoResponse struct {
 	Successful bool          `json:"successful"`
 	Message    string        `json:"message"`
-	Data       []models.Todo `json:"data"`
+	Data       []models.Todo `json:"data,omitempty"`
 	Error      error         `json:"error,omitempty"`
 }
 
